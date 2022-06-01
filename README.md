@@ -1,2 +1,2 @@
 # COURSERA-DATA-WRANGLING-ANALYSIS-ABTESTING
-UC Davis - Coursera
+Coursera - University of California, Davis
