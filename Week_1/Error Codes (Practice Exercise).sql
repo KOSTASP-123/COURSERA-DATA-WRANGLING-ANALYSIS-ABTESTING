@@ -422,3 +422,40 @@ id	min_paid_at	has_user_ordered
 |242388|	|USER_HAS_NOT_ORDERED|
 |107920|	2016-03-18 19:03:02|	YES_USER_HAS__ORDERED|
 +------------------------+-----------+--------------+
+
+/*
+Exercise 7:
+--Goal: Figure out what percent of users have ever viewed the user profile page, but this query
+isn’t right. Check to make sure the number of users adds up, and if not, fix the query.
+
+Starter Code:
+SELECT
+  (
+    CASE
+      WHEN first_view IS NULL THEN false
+      ELSE TRUE
+    END
+  ) AS has_viewed_profile_page,
+  COUNT(user_id) AS users
+FROM
+  (
+    SELECT
+      users.id AS user_id,
+      MIN(event_time) AS first_view
+    FROM
+      dsv1069.users
+      LEFT OUTER JOIN dsv1069.events ON EVENTS.user_id = users.id
+    WHERE
+      event_name = 'view_user_profile'
+    GROUP BY
+      users.id
+  )
+) first_profile_views
+GROUP BY
+  (
+    CASE
+      WHEN first_view IS NULL THEN false
+      ELSE TRUE
+    END
+  )
+  /*
