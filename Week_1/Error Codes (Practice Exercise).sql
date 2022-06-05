@@ -293,7 +293,7 @@ WHERE event_name = ‘view_item’
 --The WHERE clause statement is incorrect - use single quote instead as per below
 
 SELECT
-COUNT(event_id) AS events
+COUNT(DISTINCT event_id) AS events
 FROM dsv1069.events
 WHERE event_name = 'view_item'
 
@@ -302,7 +302,7 @@ WHERE event_name = 'view_item'
 +------------------------+-----------+--------------+
 |events|
 +------------------------+-----------+--------------+
-|525572|
+|57649|
 +------------------------+-----------+--------------+
 
 /*
@@ -344,7 +344,7 @@ WHERE
   )
   
 --Output:
-
+--Coursera output was 1649?!
 +------------------------+-----------+--------------+
 |count|
 +------------------------+-----------+--------------+
@@ -398,7 +398,8 @@ LIMIT
   END AS Has_User_Ordered
 FROM
   dsv1069.users U 
-  FULL OUTER JOIN dsv1069.orders O ON O.user_id = U.id
+  FULL OUTER JOIN dsv1069.orders O ON O.user_id = U.id --key item here is that Users table is larger than orders table so I could have done a LEDT OUTER JOIN
+                                                       -- COUNT USERS THEN LEFT JOIN THE ORDERS TABLE which would give me a similar result.
 GROUP BY
   U.id,
   O.invoice_id
@@ -446,6 +447,35 @@ FROM
       dsv1069.users
       LEFT OUTER JOIN dsv1069.events ON EVENTS.user_id = users.id
     WHERE
+      event_name = 'view_user_profile'
+    GROUP BY
+      users.id) first_profile_views
+GROUP BY
+  (
+    CASE
+      WHEN first_view IS NULL THEN false
+      ELSE TRUE
+    END
+  )
+  
+  Correct SQL provided by solution though it does not achieve the result, mine just goes str8 to the correct calculation.
+  SELECT
+  (
+    CASE
+      WHEN first_view IS NULL THEN false
+      ELSE TRUE
+    END
+  ) AS has_viewed_profile_page,
+  COUNT(user_id) AS users
+FROM
+  (
+    SELECT
+      users.id AS user_id,
+      MIN(event_time) AS first_view
+    FROM
+      dsv1069.users
+      LEFT OUTER JOIN dsv1069.events ON EVENTS.user_id = users.id
+    AND -- THIS IS THE LINE CHABGES.
       event_name = 'view_user_profile'
     GROUP BY
       users.id) first_profile_views
