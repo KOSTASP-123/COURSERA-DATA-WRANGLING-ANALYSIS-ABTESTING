@@ -463,6 +463,7 @@ GROUP BY
   --You can simply fix the problem by getting a real number rather than an integer by multiplying with 1.0 or CASTING one number to flot/decimap
   -- e.g. multiply by 1.0 to get 1.0 * 4 / 10 = 0.4
  -- https://stackoverflow.com/questions/32808849/divide-counts-from-two-different-sql-tables-without-a-join/32808935#32808935
+ 
   SELECT (
  1.0* (SELECT
       COUNT (DISTINCT user_id) 
@@ -479,6 +480,28 @@ GROUP BY
   )
 ) * 100
 AS Perc_Users
+
+--Alternatively using a CTE and then CAST to convert the interget in nominator to a decimal to allow the division
+
+ --using CTE - Common Table Expression
+ WITH User_Viewed  AS --1st query in my CTE
+(
+    SELECT
+      COUNT (DISTINCT user_id)  AS USER_VIEW
+    FROM
+      dsv1069.events
+    WHERE
+      event_name = 'view_user_profile'
+  ),
+  all_users AS (  --2nd query in my CTE
+    SELECT
+      COUNT(id) AS USERS
+    FROM
+      dsv1069.users
+  )
+
+SELECT (CAST(USER_VIEW AS DECIMAL)/USERS) * 100 -- casting as decimal or float otherwise the integer division would result ina zero
+FROM  User_Viewed,  all_users
   
   --Output:
 +------------------------+-----------+--------------+
