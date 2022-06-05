@@ -456,7 +456,7 @@ GROUP BY
       ELSE TRUE
     END
   )
-  /*
+  */
   
   --Answer: 2.59%
   --WiTHOUT use of CTE but note the multiplication by 1.0 - this is because SQL Server does integer division (MySQL does not). 
