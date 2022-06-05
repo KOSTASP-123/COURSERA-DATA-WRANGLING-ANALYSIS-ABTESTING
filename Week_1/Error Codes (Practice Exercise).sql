@@ -448,9 +448,7 @@ FROM
     WHERE
       event_name = 'view_user_profile'
     GROUP BY
-      users.id
-  )
-) first_profile_views
+      users.id) first_profile_views
 GROUP BY
   (
     CASE
@@ -459,3 +457,32 @@ GROUP BY
     END
   )
   /*
+  
+  --Answer: 2.59%
+  --WiTHOUT use of CTE but note the multiplication by 1.0 - this is because SQL Server does integer division (MySQL does not). 
+  --You can simply fix the problem by getting a real number rather than an integer by multiplying with 1.0 or CASTING one number to flot/decimap
+  -- e.g. multiply by 1.0 to get 1.0 * 4 / 10 = 0.4
+ -- https://stackoverflow.com/questions/32808849/divide-counts-from-two-different-sql-tables-without-a-join/32808935#32808935
+  SELECT (
+ 1.0* (SELECT
+      COUNT (DISTINCT user_id) 
+    FROM
+      dsv1069.events
+    WHERE
+      event_namE = 'view_user_profile'
+  )
+  /
+ (SELECT
+      COUNT(id)
+    FROM
+      dsv1069.users
+  )
+) * 100
+AS Perc_Users
+  
+  --Output:
++------------------------+-----------+--------------+
+|perc_users|
++------------------------+-----------+--------------+
+|2.5900766355459215|
++------------------------+-----------+--------------+
